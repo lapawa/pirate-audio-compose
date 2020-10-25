@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  pidi:
+    build: 
+    context: https://github.com/lapawa/pidi.git#docker:docker
+    devices:
+      # Give access to ST7789 Display via Raspberry Pi SPI 
+      - "/dev/spidev0.1:/dev/spidev0.1"
+    volumes:
+      - "pidicache:/root/.cache"
+  mpd:
+    build: ./mpd
+    ports:
+      - "6600:6600"
+    volumes:
+      - "/mnt/usbstick/music:/var/lib/mpd/music:ro"
+volumes:
+   pidicache:
+
