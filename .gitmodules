@@ -1,0 +1,3 @@
+[submodule "pidi"]
+	path = pidi
+	url = git@github.com:lapawa/pidi-container.git

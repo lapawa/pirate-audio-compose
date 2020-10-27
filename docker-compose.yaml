@@ -3,18 +3,48 @@ version: '3.3'
 services:
   pidi:
     build: 
-      context: "https://github.com/lapawa/pidi-container.git"
+      context: ./pidi
+      #    privileged: true
+    restart: unless-stopped
+    depends_on:
+      - "mpd"
     devices:
       # Give access to ST7789 Display via Raspberry Pi SPI 
       - "/dev/spidev0.1:/dev/spidev0.1"
+      - "/dev/mem:/dev/mem"
+    privileged: true
+    #    cap_add:
+    #      - SYS_RAWIO
     volumes:
-      - "pidicache:/pidi/.cache"
+      - "pidicache:/cache"
+    extra_hosts:
+      - "mpd:172.17.0.1"
+    depends_on:
+      - "mpd"
+
   mpd:
-    build: ./mpd
+    build:
+      context: ./mpd
+    restart: unless-stopped
+    #    privileged: true
+    cap_add:
+      - SYS_NICE
+    ulimits:
+      rtprio: 40
+
+        #    cpu_rt_runtime: '400ms'
+        #    cpu_rt_period: '1400us'
     ports:
       - "6600:6600"
     volumes:
-      - "/mnt/usbstick/music:/var/lib/mpd/music:ro"
+      - "/mnt/usbstick/music:/music:ro"
+      - "/mnt/usbstick/playlists:/playlists:rw"
+      - "mpdcache:/var/lib/mpd:rw"
+
+    devices:
+      - "/dev/snd:/dev/snd"
+
 volumes:
    pidicache:
+   mpdcache:
 
